@@ -1,0 +1,69 @@
+buildscript {
+  ext.kotlin_version = '1.2.41'
+
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+  }
+}
+
+group 'com.github.woodylic'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileKotlin {
+  kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+  kotlinOptions.jvmTarget = "1.8"
+}
+
+mainClassName = 'io.vertx.core.Launcher'
+
+def vertxVersion = '3.5.1'
+def mainVerticleName = 'com.github.woodylic.vertxtodo.MainVerticle'
+def watchForChange = 'src/**/*'
+def doOnChange = './gradlew classes'
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+  // Vert.x core
+  compile "io.vertx:vertx-core:$vertxVersion"
+  compile "io.vertx:vertx-rx-java2:$vertxVersion"
+
+  // Log
+  compile "ch.qos.logback:logback-classic:1.2.3"
+
+  // Test
+  testCompile "junit:junit:4.12"
+  testCompile "io.vertx:vertx-unit:$vertxVersion"
+}
+
+shadowJar {
+  classifier = 'fat'
+  manifest {
+    attributes "Main-Verticle": mainVerticleName
+  }
+  mergeServiceFiles {
+    include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+  }
+}
+
+run {
+  args = ['run', mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$mainClassName", "--on-redeploy=$doOnChange"]
+}
+
