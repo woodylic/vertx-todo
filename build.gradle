@@ -45,6 +45,9 @@ dependencies {
   compile "io.vertx:vertx-core:$vertxVersion"
   compile "io.vertx:vertx-rx-java2:$vertxVersion"
 
+  // Web
+  compile "io.vertx:vertx-web:$vertxVersion"
+
   // Log
   compile "ch.qos.logback:logback-classic:1.2.3"
 
